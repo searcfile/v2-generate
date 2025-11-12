@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>5G88 • Link Hub</title>
+<style>
+  :root{
+    --bg:#0a0a0a; --card:#121212; --muted:#b8b08a; --ink:#eae7cf;
+    --gold:#ffd74d; --gold-2:#ffe891; --ring:rgba(255,215,77,.35);
+    --shadow: 0 10px 30px rgba(0,0,0,.45), 0 6px 18px rgba(255,215,77,.10);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%, rgba(255,215,77,.08), transparent 60%), var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1100px;margin:0 auto;padding:22px}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(10,10,10,.95), rgba(10,10,10,.65) 60%, transparent);backdrop-filter:blur(6px)}
+  .hdr{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#caa327 55%, #8a6a18);box-shadow:0 6px 18px rgba(255,215,77,.25) inset, 0 2px 10px rgba(0,0,0,.45);display:grid;place-items:center;font-weight:800;color:#111}
+  .title{font-weight:800;letter-spacing:.3px}
+  .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .input, .select, .btn{height:42px;padding:0 12px;border-radius:12px;border:1px solid transparent;background:#1a1a1a;color:var(--ink);outline:none}
+  .input{min-width:220px}
+  .select{min-width:150px}
+  .btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:var(--shadow);border-color:rgba(255,215,77,.15)}
+  .btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#131313;font-weight:700;border:none}
+  .btn.ghost{background:#161616}
+  .grid{display:grid;grid-template-columns:repeat( auto-fill, minmax(230px,1fr) );gap:14px;margin-top:16px}
+  .card{background:linear-gradient(180deg,#151515,#111);border:1px solid rgba(255,215,77,.14);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .2s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(0,0,0,.6), 0 8px 18px rgba(255,215,77,.12)}
+  .card h3{margin:0 0 8px 0;font-size:17px}
+  .tag{display:inline-block;font-size:12px;color:#111;background:var(--gold);padding:4px 9px;border-radius:999px;margin-right:6px;font-weight:700}
+  .muted{color:var(--muted);font-size:12px}
+  .card .actions{margin-top:14px;display:flex;gap:8px}
+  .chip{font-size:12px;border:1px dashed rgba(255,215,77,.35);padding:6px 10px;border-radius:999px}
+  .linkbtn{width:100%;height:40px;border-radius:10px;background:#101010;border:1px solid rgba(255,215,77,.28);color:var(--gold);font-weight:700;cursor:pointer}
+  .linkbtn:hover{background:#0d0d0d}
+  .section{margin-top:10px}
+  .section h2{margin:26px 0 10px 0;font-size:14px;color:var(--muted);font-weight:700;letter-spacing:.7px}
+  .empty{padding:30px;border:1px dashed rgba(255,215,77,.25);border-radius:16px;text-align:center;color:var(--muted)}
+  /* Modal */
+  .modal-wrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);z-index:50}
+  .modal{width:min(520px,92vw);background:#141414;border:1px solid rgba(255,215,77,.22);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+  .modal h3{margin:0 0 10px 0}
+  .row{display:flex;gap:10px;margin:10px 0}
+  .row .input, .row .select{flex:1}
+  .modal .footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+  /* Viewer */
+  #viewer{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
+  .viewer-top{height:58px;background:linear-gradient(180deg,#141414,#0b0b0b);border-bottom:1px solid rgba(255,215,77,.22);display:flex;align-items:center;gap:10px;padding:0 12px}
+  .vbtn{height:36px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,215,77,.22);background:#121212;color:var(--ink);display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+  .vbtn.gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#121212;font-weight:800;border:none}
+  .vtitle{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+  .frame-wrap{flex:1}
+  .frame{width:100%;height:100%;border:0;background:#000}
+  .warn{padding:14px 14px;color:#e8d9a2;font-size:13px;border-top:1px dashed rgba(255,215,77,.28)}
+  .hide{display:none !important}
+  @media (max-width:520px){ .input{min-width:0} .tools{gap:6px} }
+</style>
+</head>
+<body>
+  <header>
+    <div class="container hdr">
+      <div class="brand">
+        <div class="logo">5G</div>
+        <div class="title">Link Hub</div>
+      </div>
+      <div class="tools">
+        <input id="q" class="input" placeholder="Cari link… (contoh: maybank / mega888)"/>
+        <select id="cat" class="select">
+          <option value="ALL">Semua Kategori</option>
+          <option value="Bank">Bank</option>
+          <option value="Platform">Platform</option>
+          <option value="Tools">Tools</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+        <button id="addBtn" class="btn gold">+ Tambah Link</button>
+        <button id="exportBtn" class="btn ghost">Export</button>
+        <button id="importBtn" class="btn ghost">Import</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="sections"></div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modalWrap" class="modal-wrap" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3 id="modalTitle">Tambah Link</h3>
+      <div class="row">
+        <input id="mName" class="input" placeholder="Nama (contoh: Maybank)"/>
+        <select id="mCat" class="select">
+          <option>Bank</option><option>Platform</option><option>Tools</option><option>Lainnya</option>
+        </select>
+      </div>
+      <div class="row">
+        <input id="mUrl" class="input" placeholder="URL (https://...)"/>
+      </div>
+      <div class="footer">
+        <button id="mDel" class="btn ghost hide">Hapus</button>
+        <button id="mCancel" class="btn ghost">Batal</button>
+        <button id="mSave" class="btn gold">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Viewer -->
+  <section id="viewer">
+    <div class="viewer-top">
+      <button id="backHome" class="vbtn">← Back to Home</button>
+      <button id="openDirect" class="vbtn gold">Buka Langsung</button>
+      <div id="vTitle" class="vtitle">—</div>
+    </div>
+    <div class="frame-wrap">
+      <iframe id="frame" class="frame" src="about:blank" referrerpolicy="no-referrer"></iframe>
+    </div>
+    <div id="xfoWarn" class="warn hide">
+      Beberapa situs (misalnya bank) tidak mengizinkan tampil di dalam iframe (X-Frame-Options).
+      Klik <b>Buka Langsung</b> agar pindah ke tujuan di tab ini. Setelah selesai, gunakan tombol back browser untuk kembali.
+    </div>
+  </section>
+
+<script>
+  /* ====== STORAGE & DATA ====== */
+  const KEY = 'linkhub.v1';
+  const DEFAULTS = [
+    { id: crypto.randomUUID(), name:'CIMB',     url:'https://searcfile.github.io/v2-generate/cimb/',       cat:'Bank'     },
+    { id: crypto.randomUUID(), name:'Maybank',  url:'https://searcfile.github.io/v2-generate/maybank/',        cat:'Bank'     },
+    { id: crypto.randomUUID(), name:'RHB',      url:'https://searcfile.github.io/v2-generate/rhb/',         cat:'Bank'     },
+    { id: crypto.randomUUID(), name:'MEGA888',  url:'https://searcfile.github.io/v2-generate/mega888/',          cat:'Platform' },
+    { id: crypto.randomUUID(), name:'918KISS',  url:'https://searcfile.github.io/v2-generate/918kiss/',          cat:'Platform' },
+    { id: crypto.randomUUID(), name:'PUSSY888', url:'https://searcfile.github.io/v2-generate/pussy888/',         cat:'Platform' },
+    { id: crypto.randomUUID(), name:'Logo Game',url:'https://searcfile.github.io/v2-generate/logogame/',         cat:'Tools'    },
+    { id: crypto.randomUUID(), name:'Tips Game',url:'https://searcfile.github.io/v2-generate/tipsgame/',         cat:'Tools'    },
+  ];
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return DEFAULTS;
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data) || data.length===0) return DEFAULTS;
+      return data;
+    }catch(e){ return DEFAULTS; }
+  }
+  function saveData(list){ localStorage.setItem(KEY, JSON.stringify(list)); }
+
+  let LINKS = loadData();
+  let editingId = null;
+
+  /* ====== RENDER ====== */
+  const sectionsEl = document.getElementById('sections');
+  const catOrder = ['Bank','Platform','Tools','Lainnya'];
+
+  function render(){
+    const q = document.getElementById('q').value.trim().toLowerCase();
+    const catFilter = document.getElementById('cat').value;
+
+    // group by category (ordered)
+    const groups = {};
+    for (const c of catOrder) groups[c] = [];
+    for (const item of LINKS){
+      const matchQ = !q || item.name.toLowerCase().includes(q) || item.url.toLowerCase().includes(q);
+      const matchC = (catFilter==='ALL') || (item.cat===catFilter);
+      if (matchQ && matchC){
+        groups[item.cat] ||= [];
+        groups[item.cat].push(item);
+      }
+    }
+
+    // build DOM
+    sectionsEl.innerHTML = '';
+    let any = false;
+    for (const c of catOrder){
+      const arr = groups[c] || [];
+      if (!arr.length) continue;
+      any = true;
+      const sec = document.createElement('section');
+      sec.className = 'section';
+      sec.innerHTML = `<h2>${c.toUpperCase()}</h2><div class="grid"></div>`;
+      const grid = sec.querySelector('.grid');
+
+      for (const it of arr){
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <span class="tag">${it.cat}</span>
+          </div>
+          <h3>${escapeHtml(it.name)}</h3>
+          <div class="muted">${escapeHtml(shortUrl(it.url))}</div>
+          <div class="actions">
+            <span class="chip">Klik untuk buka</span>
+          </div>
+          <button class="linkbtn">Pergi</button>
+        `;
+        card.querySelector('.linkbtn').addEventListener('click', ()=>openInViewer(it));
+        // edit on title click
+        card.querySelector('h3').style.cursor='pointer';
+        card.querySelector('h3').title = 'Edit';
+        card.querySelector('h3').addEventListener('click', ()=>openModal(it.id));
+        grid.appendChild(card);
+      }
+      sectionsEl.appendChild(sec);
+    }
+    if (!any){
+      sectionsEl.innerHTML = `<div class="empty">Belum ada link dengan filter ini. Klik <b>+ Tambah Link</b> untuk menambah.</div>`;
+    }
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
+  function shortUrl(u){ try{ const {host,pathname} = new URL(u); return host + pathname.replace(/\/$/,''); }catch(_){ return u; } }
+
+  /* ====== VIEWER (Back to Home + same-tab open) ====== */
+  const viewer = document.getElementById('viewer');
+  const vTitle = document.getElementById('vTitle');
+  const frame = document.getElementById('frame');
+  const xfoWarn = document.getElementById('xfoWarn');
+  const backHome = document.getElementById('backHome');
+  const openDirect = document.getElementById('openDirect');
+
+  function openInViewer(item){
+    // show viewer
+    viewer.style.display = 'flex';
+    vTitle.textContent = `${item.name} — ${item.url}`;
+    xfoWarn.classList.add('hide');
+
+    // try load in iframe
+    frame.src = 'about:blank';
+    // Give small delay so UI shows, then set
+    setTimeout(()=>{
+      frame.src = item.url;
+      // If site blocks iframe, user will see blank or error → show warning after 1.2s
+      setTimeout(()=>xfoWarn.classList.remove('hide'), 1200);
+    }, 60);
+
+    // buttons
+    backHome.onclick = ()=> {
+      // go back to home section
+      viewer.style.display = 'none';
+      frame.src = 'about:blank';
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+    openDirect.onclick = ()=> {
+      // same tab navigation
+      location.href = item.url; // not opening a new tab
+    };
+  }
+
+  /* ====== MODAL CRUD ====== */
+  const modalWrap = document.getElementById('modalWrap');
+  const mName = document.getElementById('mName');
+  const mUrl  = document.getElementById('mUrl');
+  const mCat  = document.getElementById('mCat');
+  const mSave = document.getElementById('mSave');
+  const mCancel = document.getElementById('mCancel');
+  const mDel = document.getElementById('mDel');
+  const modalTitle = document.getElementById('modalTitle');
+
+  function openModal(id=null){
+    editingId = id;
+    if (id){
+      const it = LINKS.find(x=>x.id===id);
+      mName.value = it?.name || '';
+      mUrl.value  = it?.url  || '';
+      mCat.value  = it?.cat  || 'Lainnya';
+      modalTitle.textContent = 'Edit Link';
+      mDel.classList.remove('hide');
+    }else{
+      mName.value = ''; mUrl.value = ''; mCat.value = 'Bank';
+      modalTitle.textContent = 'Tambah Link';
+      mDel.classList.add('hide');
+    }
+    modalWrap.style.display='flex';
+    mName.focus();
+  }
+  function closeModal(){ modalWrap.style.display='none'; }
+  function validUrl(u){ try{ const _= new URL(u); return true; }catch(_){ return false; } }
+
+  mSave.onclick = ()=>{
+    const name = mName.value.trim();
+    const url  = mUrl.value.trim();
+    const cat  = mCat.value.trim() || 'Lainnya';
+    if (!name || !url) { alert('Nama dan URL wajib diisi.'); return; }
+    if (!validUrl(url)) { alert('URL tidak valid. Gunakan format lengkap, contoh: https://domain.com/path'); return; }
+
+    if (editingId){
+      const i = LINKS.findIndex(x=>x.id===editingId);
+      if (i>=0){ LINKS[i] = {...LINKS[i], name, url, cat}; }
+    }else{
+      LINKS.unshift({ id: crypto.randomUUID(), name, url, cat });
+    }
+    saveData(LINKS);
+    closeModal();
+    render();
+  };
+  mCancel.onclick = closeModal;
+  mDel.onclick = ()=>{
+    if (editingId && confirm('Hapus link ini?')){
+      LINKS = LINKS.filter(x=>x.id!==editingId);
+      saveData(LINKS); closeModal(); render();
+    }
+  };
+  modalWrap.addEventListener('click', (e)=>{ if (e.target===modalWrap) closeModal(); });
+
+  /* ====== IMPORT / EXPORT ====== */
+  document.getElementById('exportBtn').onclick = ()=>{
+    const blob = new Blob([JSON.stringify(LINKS,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'linkhub-export.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+  document.getElementById('importBtn').onclick = ()=>{
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'application/json';
+    inp.onchange = ()=> {
+      const file = inp.files?.[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=> {
+        try{
+          const arr = JSON.parse(reader.result);
+          if (!Array.isArray(arr)) throw new Error('Format salah');
+          // normalisasi minimal
+          const cleaned = arr.map(x=>({
+            id: x.id || crypto.randomUUID(),
+            name: String(x.name||'').trim(),
+            url: String(x.url||'').trim(),
+            cat: String(x.cat||'Lainnya').trim()
+          })).filter(x=>x.name && x.url);
+          if (!cleaned.length) throw new Error('Tidak ada data valid');
+          LINKS = cleaned; saveData(LINKS); render();
+        }catch(err){ alert('Gagal import: '+err.message); }
+      };
+      reader.readAsText(file);
+    };
+    inp.click();
+  };
+
+  /* ====== SEARCH / FILTER / ADD ====== */
+  document.getElementById('q').addEventListener('input', render);
+  document.getElementById('cat').addEventListener('change', render);
+  document.getElementById('addBtn').addEventListener('click', ()=>openModal());
+
+  /* ====== FIRST RENDER ====== */
+  render();
+</script>
+</body>
+</html>
