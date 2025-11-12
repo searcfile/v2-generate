@@ -6,69 +6,155 @@
 <title>5G88 • Link Hub</title>
 <style>
   :root{
-    --bg:#0a0a0a; --card:#121212; --muted:#b8b08a; --ink:#eae7cf;
-    --gold:#ffd74d; --gold-2:#ffe891; --ring:rgba(255,215,77,.35);
-    --shadow: 0 10px 30px rgba(0,0,0,.45), 0 6px 18px rgba(255,215,77,.10);
+    --bg:#0a0f1a;                 /* deep blue-black */
+    --bg-2:#0c1324;
+    --card:#111521;
+    --ink:#e9eefc;
+    --muted:#93a7cc;
+
+    --primary:#1668dc;            /* main */
+    --primary-hover:#3c89e8;      /* hover */
+    --primary-active:#1554ad;     /* active */
+
+    --ring:rgba(22,104,220,.35);
+    --ring-strong:rgba(22,104,220,.55);
+    --shadow:
+      0 10px 30px rgba(0,0,0,.45),
+      0 6px 18px rgba(22,104,220,.12);
     --radius:18px;
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    background:radial-gradient(1200px 600px at 80% -10%, rgba(255,215,77,.08), transparent 60%), var(--bg);
     color:var(--ink);
-    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif
+    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(60,137,232,.14), transparent 60%),
+      radial-gradient(900px 600px at 10% 120%, rgba(21,84,173,.18), transparent 65%),
+      linear-gradient(180deg, var(--bg-2), var(--bg));
   }
   a{color:inherit;text-decoration:none}
+
+  /* Header */
   .container{max-width:1100px;margin:0 auto;padding:22px}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(10,10,10,.95), rgba(10,10,10,.65) 60%, transparent);backdrop-filter:blur(6px)}
+  header{
+    position:sticky; top:0; z-index:5;
+    background:linear-gradient(to bottom, rgba(10,16,28,.95), rgba(10,16,28,.65) 60%, transparent);
+    backdrop-filter:blur(6px)
+  }
   .hdr{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0}
   .brand{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
   .brand:active{transform:scale(.98)}
   .logo{
     width:42px;height:42px;border-radius:12px;
-    background:linear-gradient(135deg,var(--gold),#caa327 55%, #8a6a18);
-    box-shadow:0 6px 18px rgba(255,215,77,.25) inset, 0 2px 10px rgba(0,0,0,.45);
-    display:grid;place-items:center;font-weight:800;color:#111
+    background:linear-gradient(135deg,var(--primary),var(--primary-hover));
+    box-shadow:
+      0 6px 18px rgba(60,137,232,.35) inset,
+      0 2px 10px rgba(0,0,0,.45);
+    display:grid;place-items:center;font-weight:800;color:#081426
   }
   .title{font-weight:800;letter-spacing:.3px}
+
+  /* Inputs / Buttons */
   .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .input, .select, .btn{height:42px;padding:0 12px;border-radius:12px;border:1px solid transparent;background:#1a1a1a;color:var(--ink);outline:none}
+  .input, .select, .btn{
+    height:42px; padding:0 12px; border-radius:12px; outline:none;
+    border:1px solid rgba(255,255,255,.06); background:#0f1524; color:var(--ink)
+  }
   .input{min-width:220px}
   .select{min-width:150px}
-  .btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:var(--shadow);border-color:rgba(255,215,77,.15)}
-  .btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#131313;font-weight:700;border:none}
-  .btn.ghost{background:#161616}
-  .grid{display:grid;grid-template-columns:repeat( auto-fill, minmax(230px,1fr) );gap:14px;margin-top:16px}
-  .card{background:linear-gradient(180deg,#151515,#111);border:1px solid rgba(255,215,77,.14);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .2s ease}
-  .card:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(0,0,0,.6), 0 8px 18px rgba(255,215,77,.12)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:var(--shadow);
+    transition:background .15s,border-color .15s,transform .05s;
+  }
+  .btn.primary{
+    background:var(--primary); border-color:transparent; color:#fff; font-weight:700;
+  }
+  .btn.primary:hover{ background:var(--primary-hover) }
+  .btn.primary:active{ background:var(--primary-active); transform:translateY(1px) }
+  .btn.ghost{
+    background:#0f1524; border-color:rgba(255,255,255,.08);
+  }
+  .btn.ghost:hover{ border-color:var(--ring-strong) }
+
+  /* Grid / Cards */
+  .grid{display:grid;grid-template-columns:repeat( auto-fill, minmax(230px,1fr) );gap:16px;margin-top:16px}
+  .card{
+    background:linear-gradient(180deg,#111929,#0f1626);
+    border:1px solid rgba(22,104,220,.25);
+    border-radius:var(--radius);
+    padding:16px; box-shadow:var(--shadow);
+    transition:transform .15s ease, box-shadow .2s ease, border-color .15s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(0,0,0,.6), 0 8px 18px rgba(22,104,220,.18);border-color:var(--ring-strong)}
   .card h3{margin:0 0 8px 0;font-size:17px}
-  .tag{display:inline-block;font-size:12px;color:#111;background:var(--gold);padding:4px 9px;border-radius:999px;margin-right:6px;font-weight:700}
-  .muted{color:var(--muted);font-size:12px}
-  .card .actions{margin-top:14px;display:flex;gap:8px}
-  .chip{font-size:12px;border:1px dashed rgba(255,215,77,.35);padding:6px 10px;border-radius:999px}
-  .linkbtn{width:100%;height:40px;border-radius:10px;background:#101010;border:1px solid rgba(255,215,77,.28);color:var(--gold);font-weight:700;cursor:pointer}
-  .linkbtn:hover{background:#0d0d0d}
+  .tag{
+    display:inline-block;font-size:12px;color:#061223;background:rgba(60,137,232,.9);
+    padding:4px 9px;border-radius:999px;margin-right:6px;font-weight:700
+  }
+  .muted{display:none} /* hide small URL line as requested */
+  .card .actions{margin-top:12px;display:flex;gap:8px}
+  .chip{
+    font-size:12px;border:1px dashed rgba(60,137,232,.45);
+    padding:6px 10px;border-radius:999px;color:var(--muted)
+  }
+  .linkbtn{
+    width:100%;height:40px;border-radius:10px;background:#0f1524;
+    border:1px solid rgba(22,104,220,.45); color:#dbe8ff; font-weight:700; cursor:pointer;
+    transition:background .15s, transform .05s, border-color .15s
+  }
+  .linkbtn:hover{ background:#0d1322; border-color:var(--primary-hover) }
+  .linkbtn:active{ background:#0b1120; transform:translateY(1px) }
+
   .section{margin-top:10px}
   .section h2{margin:26px 0 10px 0;font-size:14px;color:var(--muted);font-weight:700;letter-spacing:.7px}
-  .empty{padding:30px;border:1px dashed rgba(255,215,77,.25);border-radius:16px;text-align:center;color:var(--muted)}
+  .empty{
+    padding:30px;border:1px dashed rgba(22,104,220,.35);
+    border-radius:16px;text-align:center;color:var(--muted)
+  }
+
   /* Modal */
-  .modal-wrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);z-index:50}
-  .modal{width:min(520px,92vw);background:#141414;border:1px solid rgba(255,215,77,.22);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+  .modal-wrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(4,10,20,.55);backdrop-filter:blur(3px);z-index:50}
+  .modal{
+    width:min(520px,92vw);background:#0f1626;border:1px solid rgba(22,104,220,.35);
+    border-radius:18px;box-shadow:var(--shadow);padding:18px
+  }
   .modal h3{margin:0 0 10px 0}
   .row{display:flex;gap:10px;margin:10px 0}
   .row .input, .row .select{flex:1}
   .modal .footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
-  /* Viewer */
-  #viewer{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
-  .viewer-top{height:58px;background:linear-gradient(180deg,#141414,#0b0b0b);border-bottom:1px solid rgba(255,215,77,.22);display:flex;align-items:center;gap:10px;padding:0 12px}
-  .vbtn{height:36px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,215,77,.22);background:#121212;color:var(--ink);display:inline-flex;align-items:center;gap:8px;cursor:pointer}
-  .vbtn.gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#121212;font-weight:800;border:none}
+
+  /* Viewer (on top of everything) */
+  #viewer{
+    position:fixed; inset:0; background:#000; display:none; flex-direction:column; z-index:9999;
+  }
+  .viewer-top{
+    position:sticky; top:0; z-index:10000;
+    height:58px;
+    background:linear-gradient(180deg,#0f1626,#0a1222);
+    border-bottom:1px solid rgba(22,104,220,.45);
+    display:flex; align-items:center; gap:10px; padding:0 12px
+  }
+  .vbtn{
+    height:36px; padding:0 12px; border-radius:12px;
+    border:1px solid rgba(22,104,220,.45);
+    background:#0f1524; color:var(--ink); display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+    transition:background .15s,transform .05s,border-color .15s
+  }
+  .vbtn:hover{ border-color:var(--primary-hover) }
+  .vbtn:active{ transform:translateY(1px) }
+  .vbtn.primary{ background:var(--primary); border-color:transparent; color:#fff; font-weight:800 }
+  .vbtn.primary:hover{ background:var(--primary-hover) }
+  .vbtn.primary:active{ background:var(--primary-active) }
+
   .vtitle{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
-  .frame-wrap{flex:1}
-  .frame{width:100%;height:100%;border:0;background:#000}
-  .warn{padding:14px 14px;color:#e8d9a2;font-size:13px;border-top:1px dashed rgba(255,215,77,.28)}
+  .frame-wrap{position:relative;flex:1}
+  .frame{position:relative;z-index:1;width:100%;height:100%;border:0;background:#000}
+  .warn{padding:14px 14px;color:#b9cffb;font-size:13px;border-top:1px dashed rgba(22,104,220,.45)}
   .hide{display:none !important}
+
   @media (max-width:520px){ .input{min-width:0} .tools{gap:6px} }
 </style>
 </head>
@@ -89,7 +175,7 @@
           <option value="Tools">Tools</option>
           <option value="Lainnya">Others</option>
         </select>
-        <button id="addBtn" class="btn gold">+ Add Link</button>
+        <button id="addBtn" class="btn primary">+ Add Link</button>
         <button id="exportBtn" class="btn ghost">Export</button>
         <button id="importBtn" class="btn ghost">Import</button>
       </div>
@@ -114,9 +200,9 @@
         <input id="mUrl" class="input" placeholder="URL (https://...)"/>
       </div>
       <div class="footer">
-        <button id="mDel" class="btn ghost hide">Delete</button>
+        <button id="mDel" class="btn ghost">Delete</button>
         <button id="mCancel" class="btn ghost">Cancel</button>
-        <button id="mSave" class="btn gold">Save</button>
+        <button id="mSave" class="btn primary">Save</button>
       </div>
     </div>
   </div>
@@ -125,7 +211,7 @@
   <section id="viewer">
     <div class="viewer-top">
       <button id="backHome" class="vbtn">← Back to Home</button>
-      <button id="openDirect" class="vbtn gold">Open Direct</button>
+      <button id="openDirect" class="vbtn primary">Open Direct</button>
       <div id="vTitle" class="vtitle">—</div>
     </div>
     <div class="frame-wrap">
@@ -172,25 +258,20 @@
     const q = document.getElementById('q').value.trim().toLowerCase();
     const catFilter = document.getElementById('cat').value;
 
-    // group by category (ordered)
-    const groups = {};
-    for (const c of catOrder) groups[c] = [];
+    const groups = {}; for (const c of catOrder) groups[c] = [];
     for (const item of LINKS){
       const matchQ = !q || item.name.toLowerCase().includes(q) || item.url.toLowerCase().includes(q);
       const matchC = (catFilter==='ALL') || (item.cat===catFilter);
-      if (matchQ && matchC){
-        groups[item.cat] ||= [];
-        groups[item.cat].push(item);
-      }
+      if (matchQ && matchC){ (groups[item.cat] ||= []).push(item); }
     }
 
-    // build DOM
     sectionsEl.innerHTML = '';
     let any = false;
     for (const c of catOrder){
       const arr = groups[c] || [];
       if (!arr.length) continue;
       any = true;
+
       const sec = document.createElement('section');
       const heading = (c==='Lainnya') ? 'OTHERS' : c.toUpperCase();
       sec.className = 'section';
@@ -208,7 +289,6 @@
           <button class="linkbtn">Go</button>
         `;
         card.querySelector('.linkbtn').addEventListener('click', ()=>openInViewer(it));
-        // edit on title click
         card.querySelector('h3').style.cursor='pointer';
         card.querySelector('h3').title = 'Edit';
         card.querySelector('h3').addEventListener('click', ()=>openModal(it.id));
@@ -224,7 +304,7 @@
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
   function shortUrl(u){ try{ const {host,pathname} = new URL(u); return host + pathname.replace(/\/$/,''); }catch(_){ return u; } }
 
-  /* ====== VIEWER (Back to Home + same-tab open) ====== */
+  /* ====== VIEWER ====== */
   const viewer = document.getElementById('viewer');
   const vTitle = document.getElementById('vTitle');
   const frame = document.getElementById('frame');
@@ -250,12 +330,10 @@
     window.scrollTo({top:0, behavior:'smooth'});
   }
 
-  // buttons
   backHome.onclick = goHome;
   openDirect.onclick = ()=> location.href = frame.src || 'about:blank';
   document.getElementById('homeBtn').addEventListener('click', goHome);
 
-  // ESC = back to home from viewer
   document.addEventListener('keydown', (e)=>{
     if (e.key === 'Escape' && viewer.style.display !== 'none') goHome();
   });
@@ -310,7 +388,8 @@
   };
   mCancel.onclick = closeModal;
   mDel.onclick = ()=>{
-    if (editingId && confirm('Delete this link?')){
+    if (!editingId) return;
+    if (confirm('Delete this link?')){
       LINKS = LINKS.filter(x=>x.id!==editingId);
       saveData(LINKS); closeModal(); render();
     }
