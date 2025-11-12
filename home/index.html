@@ -13,13 +13,24 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%, rgba(255,215,77,.08), transparent 60%), var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  body{
+    margin:0;
+    background:radial-gradient(1200px 600px at 80% -10%, rgba(255,215,77,.08), transparent 60%), var(--bg);
+    color:var(--ink);
+    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif
+  }
   a{color:inherit;text-decoration:none}
   .container{max-width:1100px;margin:0 auto;padding:22px}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(10,10,10,.95), rgba(10,10,10,.65) 60%, transparent);backdrop-filter:blur(6px)}
   .hdr{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0}
-  .brand{display:flex;align-items:center;gap:12px}
-  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#caa327 55%, #8a6a18);box-shadow:0 6px 18px rgba(255,215,77,.25) inset, 0 2px 10px rgba(0,0,0,.45);display:grid;place-items:center;font-weight:800;color:#111}
+  .brand{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+  .brand:active{transform:scale(.98)}
+  .logo{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--gold),#caa327 55%, #8a6a18);
+    box-shadow:0 6px 18px rgba(255,215,77,.25) inset, 0 2px 10px rgba(0,0,0,.45);
+    display:grid;place-items:center;font-weight:800;color:#111
+  }
   .title{font-weight:800;letter-spacing:.3px}
   .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .input, .select, .btn{height:42px;padding:0 12px;border-radius:12px;border:1px solid transparent;background:#1a1a1a;color:var(--ink);outline:none}
@@ -64,20 +75,21 @@
 <body>
   <header>
     <div class="container hdr">
-      <div class="brand">
+      <!-- Clickable brand to go Home -->
+      <div class="brand" id="homeBtn">
         <div class="logo">5G</div>
         <div class="title">Link Hub</div>
       </div>
       <div class="tools">
-        <input id="q" class="input" placeholder="Cari link… (contoh: maybank / mega888)"/>
+        <input id="q" class="input" placeholder="Search links… (e.g., maybank / mega888)"/>
         <select id="cat" class="select">
-          <option value="ALL">Semua Kategori</option>
+          <option value="ALL">All Categories</option>
           <option value="Bank">Bank</option>
           <option value="Platform">Platform</option>
           <option value="Tools">Tools</option>
-          <option value="Lainnya">Lainnya</option>
+          <option value="Lainnya">Others</option>
         </select>
-        <button id="addBtn" class="btn gold">+ Tambah Link</button>
+        <button id="addBtn" class="btn gold">+ Add Link</button>
         <button id="exportBtn" class="btn ghost">Export</button>
         <button id="importBtn" class="btn ghost">Import</button>
       </div>
@@ -91,20 +103,20 @@
   <!-- Modal -->
   <div id="modalWrap" class="modal-wrap" role="dialog" aria-modal="true">
     <div class="modal">
-      <h3 id="modalTitle">Tambah Link</h3>
+      <h3 id="modalTitle">Add Link</h3>
       <div class="row">
-        <input id="mName" class="input" placeholder="Nama (contoh: Maybank)"/>
+        <input id="mName" class="input" placeholder="Name (e.g., Maybank)"/>
         <select id="mCat" class="select">
-          <option>Bank</option><option>Platform</option><option>Tools</option><option>Lainnya</option>
+          <option>Bank</option><option>Platform</option><option>Tools</option><option>Others</option>
         </select>
       </div>
       <div class="row">
         <input id="mUrl" class="input" placeholder="URL (https://...)"/>
       </div>
       <div class="footer">
-        <button id="mDel" class="btn ghost hide">Hapus</button>
-        <button id="mCancel" class="btn ghost">Batal</button>
-        <button id="mSave" class="btn gold">Simpan</button>
+        <button id="mDel" class="btn ghost hide">Delete</button>
+        <button id="mCancel" class="btn ghost">Cancel</button>
+        <button id="mSave" class="btn gold">Save</button>
       </div>
     </div>
   </div>
@@ -113,15 +125,15 @@
   <section id="viewer">
     <div class="viewer-top">
       <button id="backHome" class="vbtn">← Back to Home</button>
-      <button id="openDirect" class="vbtn gold">Buka Langsung</button>
+      <button id="openDirect" class="vbtn gold">Open Direct</button>
       <div id="vTitle" class="vtitle">—</div>
     </div>
     <div class="frame-wrap">
       <iframe id="frame" class="frame" src="about:blank" referrerpolicy="no-referrer"></iframe>
     </div>
     <div id="xfoWarn" class="warn hide">
-      Beberapa situs (misalnya bank) tidak mengizinkan tampil di dalam iframe (X-Frame-Options).
-      Klik <b>Buka Langsung</b> agar pindah ke tujuan di tab ini. Setelah selesai, gunakan tombol back browser untuk kembali.
+      Some sites (e.g., banks) block being shown inside an iframe (X-Frame-Options).
+      Click <b>Open Direct</b> to navigate in this tab. Use your browser’s Back button to return, then “Back to Home”.
     </div>
   </section>
 
@@ -129,14 +141,14 @@
   /* ====== STORAGE & DATA ====== */
   const KEY = 'linkhub.v1';
   const DEFAULTS = [
-    { id: crypto.randomUUID(), name:'CIMB',     url:'https://searcfile.github.io/v2-generate/cimb/',       cat:'Bank'     },
-    { id: crypto.randomUUID(), name:'Maybank',  url:'https://searcfile.github.io/v2-generate/maybank/',        cat:'Bank'     },
-    { id: crypto.randomUUID(), name:'RHB',      url:'https://searcfile.github.io/v2-generate/rhb/',         cat:'Bank'     },
-    { id: crypto.randomUUID(), name:'MEGA888',  url:'https://searcfile.github.io/v2-generate/mega888/',          cat:'Platform' },
-    { id: crypto.randomUUID(), name:'918KISS',  url:'https://searcfile.github.io/v2-generate/918kiss/',          cat:'Platform' },
-    { id: crypto.randomUUID(), name:'PUSSY888', url:'https://searcfile.github.io/v2-generate/pussy888/',         cat:'Platform' },
-    { id: crypto.randomUUID(), name:'Logo Game',url:'https://searcfile.github.io/v2-generate/logogame/',         cat:'Tools'    },
-    { id: crypto.randomUUID(), name:'Tips Game',url:'https://searcfile.github.io/v2-generate/tipsgame/',         cat:'Tools'    },
+    { id: crypto.randomUUID(), name:'CIMB',     url:'https://searcfile.github.io/v2-generate/cimb/',     cat:'Bank'     },
+    { id: crypto.randomUUID(), name:'Maybank',  url:'https://searcfile.github.io/v2-generate/maybank/',  cat:'Bank'     },
+    { id: crypto.randomUUID(), name:'RHB',      url:'https://searcfile.github.io/v2-generate/rhb/',      cat:'Bank'     },
+    { id: crypto.randomUUID(), name:'MEGA888',  url:'https://searcfile.github.io/v2-generate/mega888/',  cat:'Platform' },
+    { id: crypto.randomUUID(), name:'918KISS',  url:'https://searcfile.github.io/v2-generate/918kiss/',  cat:'Platform' },
+    { id: crypto.randomUUID(), name:'PUSSY888', url:'https://searcfile.github.io/v2-generate/pussy888/', cat:'Platform' },
+    { id: crypto.randomUUID(), name:'Logo Game',url:'https://searcfile.github.io/v2-generate/logogame/', cat:'Tools'    },
+    { id: crypto.randomUUID(), name:'Tips Game',url:'https://searcfile.github.io/v2-generate/tipsgame/', cat:'Tools'    },
   ];
   function loadData(){
     try{
@@ -154,7 +166,7 @@
 
   /* ====== RENDER ====== */
   const sectionsEl = document.getElementById('sections');
-  const catOrder = ['Bank','Platform','Tools','Lainnya'];
+  const catOrder = ['Bank','Platform','Tools','Lainnya','Others']; // support both labels
 
   function render(){
     const q = document.getElementById('q').value.trim().toLowerCase();
@@ -180,23 +192,20 @@
       if (!arr.length) continue;
       any = true;
       const sec = document.createElement('section');
+      const heading = (c==='Lainnya') ? 'OTHERS' : c.toUpperCase();
       sec.className = 'section';
-      sec.innerHTML = `<h2>${c.toUpperCase()}</h2><div class="grid"></div>`;
+      sec.innerHTML = `<h2>${heading}</h2><div class="grid"></div>`;
       const grid = sec.querySelector('.grid');
 
       for (const it of arr){
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <div>
-            <span class="tag">${it.cat}</span>
-          </div>
+          <div><span class="tag">${it.cat === 'Lainnya' ? 'Others' : it.cat}</span></div>
           <h3>${escapeHtml(it.name)}</h3>
           <div class="muted">${escapeHtml(shortUrl(it.url))}</div>
-          <div class="actions">
-            <span class="chip">Klik untuk buka</span>
-          </div>
-          <button class="linkbtn">Pergi</button>
+          <div class="actions"><span class="chip">Click to open</span></div>
+          <button class="linkbtn">Go</button>
         `;
         card.querySelector('.linkbtn').addEventListener('click', ()=>openInViewer(it));
         // edit on title click
@@ -208,7 +217,7 @@
       sectionsEl.appendChild(sec);
     }
     if (!any){
-      sectionsEl.innerHTML = `<div class="empty">Belum ada link dengan filter ini. Klik <b>+ Tambah Link</b> untuk menambah.</div>`;
+      sectionsEl.innerHTML = `<div class="empty">No links match your filter. Click <b>+ Add Link</b> to create one.</div>`;
     }
   }
 
@@ -224,32 +233,32 @@
   const openDirect = document.getElementById('openDirect');
 
   function openInViewer(item){
-    // show viewer
     viewer.style.display = 'flex';
     vTitle.textContent = `${item.name} — ${item.url}`;
     xfoWarn.classList.add('hide');
 
-    // try load in iframe
     frame.src = 'about:blank';
-    // Give small delay so UI shows, then set
     setTimeout(()=>{
       frame.src = item.url;
-      // If site blocks iframe, user will see blank or error → show warning after 1.2s
       setTimeout(()=>xfoWarn.classList.remove('hide'), 1200);
     }, 60);
-
-    // buttons
-    backHome.onclick = ()=> {
-      // go back to home section
-      viewer.style.display = 'none';
-      frame.src = 'about:blank';
-      window.scrollTo({top:0, behavior:'smooth'});
-    };
-    openDirect.onclick = ()=> {
-      // same tab navigation
-      location.href = item.url; // not opening a new tab
-    };
   }
+
+  function goHome(){
+    viewer.style.display = 'none';
+    frame.src = 'about:blank';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // buttons
+  backHome.onclick = goHome;
+  openDirect.onclick = ()=> location.href = frame.src || 'about:blank';
+  document.getElementById('homeBtn').addEventListener('click', goHome);
+
+  // ESC = back to home from viewer
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape' && viewer.style.display !== 'none') goHome();
+  });
 
   /* ====== MODAL CRUD ====== */
   const modalWrap = document.getElementById('modalWrap');
@@ -267,12 +276,12 @@
       const it = LINKS.find(x=>x.id===id);
       mName.value = it?.name || '';
       mUrl.value  = it?.url  || '';
-      mCat.value  = it?.cat  || 'Lainnya';
+      mCat.value  = (it?.cat==='Lainnya') ? 'Others' : (it?.cat || 'Others');
       modalTitle.textContent = 'Edit Link';
       mDel.classList.remove('hide');
     }else{
       mName.value = ''; mUrl.value = ''; mCat.value = 'Bank';
-      modalTitle.textContent = 'Tambah Link';
+      modalTitle.textContent = 'Add Link';
       mDel.classList.add('hide');
     }
     modalWrap.style.display='flex';
@@ -284,9 +293,10 @@
   mSave.onclick = ()=>{
     const name = mName.value.trim();
     const url  = mUrl.value.trim();
-    const cat  = mCat.value.trim() || 'Lainnya';
-    if (!name || !url) { alert('Nama dan URL wajib diisi.'); return; }
-    if (!validUrl(url)) { alert('URL tidak valid. Gunakan format lengkap, contoh: https://domain.com/path'); return; }
+    let cat    = mCat.value.trim() || 'Others';
+    if (cat === 'Others') cat = 'Lainnya'; // normalize storage
+    if (!name || !url) { alert('Name and URL are required.'); return; }
+    if (!validUrl(url)) { alert('Invalid URL. Use the full format, e.g., https://domain.com/path'); return; }
 
     if (editingId){
       const i = LINKS.findIndex(x=>x.id===editingId);
@@ -300,7 +310,7 @@
   };
   mCancel.onclick = closeModal;
   mDel.onclick = ()=>{
-    if (editingId && confirm('Hapus link ini?')){
+    if (editingId && confirm('Delete this link?')){
       LINKS = LINKS.filter(x=>x.id!==editingId);
       saveData(LINKS); closeModal(); render();
     }
@@ -325,17 +335,16 @@
       reader.onload = ()=> {
         try{
           const arr = JSON.parse(reader.result);
-          if (!Array.isArray(arr)) throw new Error('Format salah');
-          // normalisasi minimal
+          if (!Array.isArray(arr)) throw new Error('Bad format');
           const cleaned = arr.map(x=>({
             id: x.id || crypto.randomUUID(),
             name: String(x.name||'').trim(),
             url: String(x.url||'').trim(),
             cat: String(x.cat||'Lainnya').trim()
           })).filter(x=>x.name && x.url);
-          if (!cleaned.length) throw new Error('Tidak ada data valid');
+          if (!cleaned.length) throw new Error('No valid items');
           LINKS = cleaned; saveData(LINKS); render();
-        }catch(err){ alert('Gagal import: '+err.message); }
+        }catch(err){ alert('Import failed: '+err.message); }
       };
       reader.readAsText(file);
     };
