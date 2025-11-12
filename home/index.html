@@ -211,6 +211,8 @@
   <section id="viewer">
     <div class="viewer-top">
       <button id="backHome" class="vbtn">← Back to Home</button>
+      <button id="openDirect" class="vbtn primary">Open Direct</button>
+      <div id="vTitle" class="vtitle">—</div>
     </div>
     <div class="frame-wrap">
       <iframe id="frame" class="frame" src="about:blank" referrerpolicy="no-referrer"></iframe>
@@ -329,6 +331,7 @@
   }
 
   backHome.onclick = goHome;
+  openDirect.onclick = ()=> location.href = frame.src || 'about:blank';
   document.getElementById('homeBtn').addEventListener('click', goHome);
 
   document.addEventListener('keydown', (e)=>{
