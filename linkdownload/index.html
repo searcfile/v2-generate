@@ -126,10 +126,38 @@
         width: 100%;
       }
     }
-    
+    .back-home-float-v2{
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 99999;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(22,104,220,.7);
+    background: #0b1120;
+    color: #e5edff;
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, Helvetica, Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    user-select: none;
+  }
+  .back-home-float-v2:hover{
+    background:#111827;
+  }
+  .back-home-float-v2:active{
+    transform: translateY(1px);
+  }
 </style>
 </head>
 <body>
+<button id="backHomeFloatV2" class="back-home-float-v2">
+  ← Back to Home
+</button>
 <div class="header">🎰 LINK DOWNLOAD 🎰</div>
 
 <div class="container">
@@ -419,6 +447,28 @@ function goToPage(input) {
     window.location.href = "https://" + input;
   }
 }
+  (function(){
+    // GANTI ke URL Link Hub kau
+    const HOME_URL = 'https://5g88-v2.vercel.app/';
+
+    const btn = document.getElementById('backHomeFloatV2');
+    if (!btn) return;
+
+    // check kalau datang dari Link Hub
+    const fromHub = document.referrer &&
+      (document.referrer.includes('5g88-v2.vercel.app') ||
+       document.referrer.includes('v2-generate/home'));
+
+    btn.addEventListener('click', function(){
+      if (fromHub && window.history.length > 1){
+        // balik ke page sebelum ini (Link Hub)
+        window.history.back();
+      } else {
+        // kalau buka direct / tiada history → terus pergi ke Link Hub
+        window.location.href = HOME_URL;
+      }
+    });
+  })();
 </script>
 </body>
 </html>
