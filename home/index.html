@@ -326,29 +326,35 @@
   const xfoWarn = document.getElementById('xfoWarn');
   const backHome = document.getElementById('backHome');
 
-  function openInViewer(item){
-    viewer.style.display = 'flex';
-    xfoWarn.classList.add('hide');
+function openInViewer(item){
+  // 1) Jika link perlukan fungsi COPY IMAGE, buka direct (tanpa iframe)
+  const needsClipboard = /v2-generate\/(mega888|918kiss|pussy888|logogame|tipsgame|linkdownload)\//i.test(item.url);
+  if (needsClipboard){
+    window.location.href = item.url;   // buka di tab yang sama
+    return;
+  }
 
-    // Reset iframe, then attempt to load
-    frame.src = 'about:blank';
-    let loaded = false;
-    frame.onload = () => { loaded = true; };
+  // 2) Selain itu, gunakan viewer (iframe) macam biasa
+  viewer.style.display = 'flex';
+  xfoWarn.classList.add('hide');
+
+  frame.src = 'about:blank';
+  let loaded = false;
+  frame.onload = () => { loaded = true; };
+
+  setTimeout(()=>{
+    frame.src = item.url;
 
     setTimeout(()=>{
-      frame.src = item.url;
-
-      // If not loaded after a short delay, likely blocked → navigate same tab
-      setTimeout(()=>{
-        if (!loaded) {
-          location.href = item.url; // same-tab
-        } else {
-          // show info note only when it actually loads in iframe
-          xfoWarn.classList.remove('hide');
-        }
-      }, 1100);
-    }, 60);
-  }
+      if (!loaded) {
+        // kalau memang di-block oleh X-Frame-Options → buka direct
+        location.href = item.url;
+      } else {
+        xfoWarn.classList.remove('hide');
+      }
+    }, 1100);
+  }, 60);
+}
 
   function goHome(){
     viewer.style.display = 'none';
