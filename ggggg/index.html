@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>5G88 App Deep-Link Tester</title>
+  <title>5G88 • App Launcher Tester</title>
   <style>
     :root{
       --bg:#07090f;
@@ -13,7 +13,6 @@
       --muted:rgba(234,240,255,.75);
       --gold:#facc15;
       --gold2:#ffd86b;
-      --btn:#141c33;
       --danger:#ff5c7a;
       --ok:#31d0aa;
     }
@@ -29,25 +28,15 @@
       padding:18px;
     }
     .wrap{max-width:980px;margin:0 auto}
-    .top{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      margin-bottom:14px;
-    }
-    .title{
-      font-weight:800; letter-spacing:.3px;
-      font-size:18px;
-    }
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .title{font-weight:800;letter-spacing:.3px;font-size:18px}
     .pill{
       font-size:12px;color:var(--muted);
       border:1px solid var(--line);
       padding:6px 10px;border-radius:999px;
       background:rgba(255,255,255,.03)
     }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:12px;
-    }
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
     @media (max-width:900px){ .grid{grid-template-columns:1fr} }
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
@@ -61,21 +50,12 @@
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       border-bottom:1px solid var(--line);
     }
-    .brand{
-      display:flex;align-items:center;gap:10px;
-      font-weight:800;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:50%;
-      background:var(--gold);
-      box-shadow:0 0 0 4px rgba(250,204,21,.14);
-    }
-    .small{
-      font-size:12px;color:var(--muted);
-    }
-    .card-b{ padding:14px }
-    label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px }
-    input{
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(250,204,21,.14)}
+    .small{font-size:12px;color:var(--muted)}
+    .card-b{padding:14px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    input, select{
       width:100%;
       padding:10px 12px;
       border-radius:12px;
@@ -84,11 +64,11 @@
       color:var(--txt);
       outline:none;
     }
-    input:focus{
+    input:focus, select:focus{
       border-color:rgba(250,204,21,.45);
       box-shadow:0 0 0 3px rgba(250,204,21,.18);
     }
-    .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap }
+    .row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
     button, a.btn{
       appearance:none;
       border:1px solid var(--line);
@@ -105,9 +85,14 @@
       border-color:rgba(250,204,21,.35);
       background:linear-gradient(180deg, rgba(250,204,21,.18), rgba(250,204,21,.06));
     }
-    button:hover, a.btn:hover{ transform:translateY(-1px) }
-    .warn{ color:var(--danger); font-size:12px; margin-top:10px; line-height:1.4 }
-    .ok{ color:var(--ok) }
+    button.ghost{background:rgba(0,0,0,.12)}
+    button.dl{
+      border-color:rgba(255,92,122,.35);
+      background:linear-gradient(180deg, rgba(255,92,122,.12), rgba(255,92,122,.05));
+    }
+    button:hover, a.btn:hover{transform:translateY(-1px)}
+    .hint{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.4}
+    .hint code{color:var(--gold2)}
     .log{
       margin-top:16px;
       border:1px dashed rgba(255,255,255,.18);
@@ -120,87 +105,102 @@
       line-height:1.5;
       min-height:56px;
     }
-    .footer{
-      margin-top:14px;
-      font-size:12px;color:var(--muted);
-    }
-    code{color:var(--gold2)}
+    .tag{font-size:11px;border:1px solid var(--line);padding:4px 8px;border-radius:999px;color:var(--muted)}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
-      <div class="title">5G88 • App Deep-Link Tester</div>
+      <div class="title">5G88 • App Launcher Tester</div>
       <div class="pill" id="uaPill">Detecting device...</div>
     </div>
 
     <div class="grid">
 
       <!-- MEGA888 -->
-      <section class="card" data-app="MEGA888">
+      <section class="card">
         <div class="card-h">
           <div class="brand"><span class="dot"></span> MEGA888</div>
-          <div class="small">Try open app → fallback download</div>
+          <div class="small"><span class="tag">Mode: PWA / Scheme</span></div>
         </div>
         <div class="card-b">
-          <label>Scheme / Deep link (edit to test)</label>
-          <input id="schemeMega" value="mega888://" />
+          <label>Open mode</label>
+          <select id="modeMega">
+            <option value="pwa">PWA URL (Web-App)</option>
+            <option value="scheme">Scheme (APK deep link)</option>
+          </select>
+
+          <label style="margin-top:10px">PWA URL / Scheme value</label>
+          <input id="valueMega" value="mega888://" />
+
           <div class="row">
-            <button class="primary" onclick="tryOpenApp('MEGA888', schemeMega.value, 'https://download-mega888.vercel.app/')">
-              ▶ PLAY NOW
-            </button>
-            <a class="btn" href="https://download-mega888.vercel.app/" target="_blank" rel="noopener">
-              ⬇ DOWNLOAD
-            </a>
+            <button class="primary" onclick="smartPlay('MEGA888', modeMega.value, valueMega.value, 'https://download-mega888.vercel.app/')">▶ PLAY NOW</button>
+            <button class="ghost" onclick="testOnly('MEGA888', valueMega.value)">🧪 TEST OPEN</button>
+            <a class="btn" href="https://download-mega888.vercel.app/" target="_blank" rel="noopener">⬇ DOWNLOAD</a>
           </div>
-          <div class="warn">
-            Tip: kalau tak buka, try tukar kepada <code>mega888app://</code> atau apa-apa scheme lain yang app kau support.
+
+          <div class="hint">
+            Kalau MEGA888 kau sebenarnya PWA, tukar mode ke <code>PWA URL</code> dan paste URL PWA dari <code>chrome://apps</code>.
+            Kalau APK native, guna <code>scheme</code> macam <code>mega888://</code> / <code>mega888app://</code>.
           </div>
         </div>
       </section>
 
       <!-- PUSSY888 -->
-      <section class="card" data-app="PUSSY888">
+      <section class="card">
         <div class="card-h">
           <div class="brand"><span class="dot"></span> PUSSY888</div>
-          <div class="small">Try open app → fallback download</div>
+          <div class="small"><span class="tag">Mode: PWA / Scheme</span></div>
         </div>
         <div class="card-b">
-          <label>Scheme / Deep link (edit to test)</label>
-          <input id="schemePussy" value="pussy888.apk://" />
+          <label>Open mode</label>
+          <select id="modePussy">
+            <option value="pwa">PWA URL (Web-App)</option>
+            <option value="scheme">Scheme (APK deep link)</option>
+          </select>
+
+          <label style="margin-top:10px">PWA URL / Scheme value</label>
+          <input id="valuePussy" value="pussy888://" />
+
           <div class="row">
-            <button class="primary" onclick="tryOpenApp('PUSSY888', schemePussy.value, 'https://download-pussy888.vercel.app/')">
-              ▶ PLAY NOW
-            </button>
-            <a class="btn" href="https://download-pussy888.vercel.app/" target="_blank" rel="noopener">
-              ⬇ DOWNLOAD
-            </a>
+            <button class="primary" onclick="smartPlay('PUSSY888', modePussy.value, valuePussy.value, 'https://download-pussy888.vercel.app/')">▶ PLAY NOW</button>
+            <button class="ghost" onclick="testOnly('PUSSY888', valuePussy.value)">🧪 TEST OPEN</button>
+            <a class="btn" href="https://download-pussy888.vercel.app/" target="_blank" rel="noopener">⬇ DOWNLOAD</a>
           </div>
-          <div class="warn">
-            Tip: kalau tak buka, try <code>pussy888app://</code> / <code>pussy://</code> / scheme lain ikut version.
+
+          <div class="hint">
+            Jangan guna <code>pussy888.apk://</code> (tak valid).  
+            Kalau PWA, paste URL PWA. Kalau APK native, cuba <code>pussy888://</code> atau <code>pussy888app://</code>.
           </div>
         </div>
       </section>
 
       <!-- 918KISS -->
-      <section class="card" data-app="918KISS">
+      <section class="card">
         <div class="card-h">
           <div class="brand"><span class="dot"></span> 918KISS</div>
-          <div class="small">Try open app → fallback download</div>
+          <div class="small"><span class="tag">Default: PWA URL</span></div>
         </div>
         <div class="card-b">
-          <label>Scheme / Deep link (edit to test)</label>
-          <input id="scheme918" value="918kiss://" />
+          <label>Open mode</label>
+          <select id="mode918">
+            <option value="pwa" selected>PWA URL (Web-App)</option>
+            <option value="scheme">Scheme (APK deep link)</option>
+          </select>
+
+          <label style="margin-top:10px">PWA URL / Scheme value</label>
+          <input id="value918" value="https://001.n918k.com/h5" />
+
           <div class="row">
-            <button class="primary" onclick="tryOpenApp('918KISS', scheme918.value, 'https://download-918kiss.vercel.app/')">
-              ▶ PLAY NOW
-            </button>
-            <a class="btn" href="https://download-918kiss.vercel.app/" target="_blank" rel="noopener">
-              ⬇ DOWNLOAD
-            </a>
+            <button class="primary" onclick="smartPlay('918KISS', mode918.value, value918.value, 'https://download-918kiss.vercel.app/')">▶ PLAY NOW</button>
+            <button class="ghost" onclick="testOnly('918KISS', value918.value)">🧪 TEST OPEN</button>
+            <a class="btn" href="https://download-918kiss.vercel.app/" target="_blank" rel="noopener">⬇ DOWNLOAD</a>
           </div>
-          <div class="warn">
-            Tip: kalau tak buka, try <code>kiss918://</code> / <code>918kissapp://</code> dll.
+
+          <div class="hint">
+            Untuk 918KissTH yang “installed from Chrome”, mode betul ialah <code>PWA URL</code>.  
+            Scheme <code>918kiss://</code> hanya jalan kalau kau install APK native yang ada deep link.
           </div>
         </div>
       </section>
@@ -208,11 +208,6 @@
     </div>
 
     <div class="log" id="logBox">Log akan keluar di sini…</div>
-
-    <div class="footer">
-      Nota: iOS kadang akan keluar popup “Open in App?”. Android biasanya terus buka kalau scheme betul.
-      Kalau semua fail, maksudnya app kau tak support scheme itu — kita kena cari scheme sebenar.
-    </div>
   </div>
 
   <script>
@@ -221,7 +216,6 @@
 
     function isAndroid(){ return /android/i.test(navigator.userAgent); }
     function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent); }
-
     uaPill.textContent = isAndroid() ? "Android detected" : (isIOS() ? "iOS detected" : "Desktop / Unknown");
 
     function log(msg){
@@ -229,28 +223,57 @@
       logBox.textContent = `[${time}] ${msg}\n\n` + logBox.textContent;
     }
 
-    // Core: try open deep link; fallback after 1.3s to download page
-    function tryOpenApp(appName, schemeUrl, fallbackUrl){
-      schemeUrl = (schemeUrl || "").trim();
-      if(!schemeUrl){
-        log(`❌ ${appName}: Scheme kosong. Isi dulu contoh: ${appName.toLowerCase()}://`);
+    function isLikelyUrl(v){
+      return /^https?:\/\//i.test(v);
+    }
+    function isLikelyScheme(v){
+      return /^[a-z][a-z0-9+\-.]*:\/\//i.test(v) && !isLikelyUrl(v);
+    }
+
+    // ✅ TEST ONLY: just attempt open, no fallback
+    function testOnly(appName, value){
+      const v = (value || "").trim();
+      if(!v){ log(`❌ ${appName}: value kosong.`); return; }
+      log(`🧪 ${appName}: TEST OPEN → ${v}`);
+      window.location.href = v;
+    }
+
+    // ✅ SMART PLAY:
+    // - If mode=pwa → MUST be https URL.
+    // - If mode=scheme → MUST look like scheme:// (not http).
+    // - No auto redirect to download. Instead show a confirm button after 1.5s.
+    function smartPlay(appName, mode, value, downloadUrl){
+      const v = (value || "").trim();
+      if(!v){
+        log(`❌ ${appName}: value kosong.`);
         return;
       }
 
-      log(`🚀 ${appName}: Cuba buka → ${schemeUrl}`);
+      if(mode === "pwa"){
+        if(!isLikelyUrl(v)){
+          log(`❌ ${appName}: Mode PWA mesti guna URL bermula http(s)://`);
+          return;
+        }
+      } else {
+        if(!isLikelyScheme(v)){
+          log(`❌ ${appName}: Mode Scheme mesti guna format contoh: ${appName.toLowerCase()}://`);
+          return;
+        }
+      }
 
-      // iOS/Android both: attempt scheme navigation
+      log(`🚀 ${appName}: PLAY NOW (${mode.toUpperCase()}) → ${v}`);
       const start = Date.now();
-      window.location.href = schemeUrl;
+      window.location.href = v;
 
-      // fallback if app not opened (best-effort)
+      // ✅ Instead of auto redirect, show manual fallback suggestion
       setTimeout(() => {
         const elapsed = Date.now() - start;
-        // If browser didn't go background / app didn't take over, fallback
-        // (Not perfect, but OK for testing)
-        log(`↩ ${appName}: Kalau app tak terbuka, pergi download (${elapsed}ms) → ${fallbackUrl}`);
-        window.location.href = fallbackUrl;
-      }, 1300);
+        log(`ℹ️ ${appName}: Kalau app tak terbuka (${elapsed}ms), tekan DOWNLOAD manual: ${downloadUrl}`);
+        // Optional: open confirm dialog (user-controlled)
+        if (confirm(`${appName} tak terbuka?\n\nTekan OK untuk pergi ke Download.`)) {
+          window.location.href = downloadUrl;
+        }
+      }, 1500);
     }
   </script>
 </body>
