@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>5G88 App Deep-Link Tester</title>
+  <style>
+    :root{
+      --bg:#07090f;
+      --card:#0e1324;
+      --line:rgba(255,255,255,.08);
+      --txt:#eaf0ff;
+      --muted:rgba(234,240,255,.75);
+      --gold:#facc15;
+      --gold2:#ffd86b;
+      --btn:#141c33;
+      --danger:#ff5c7a;
+      --ok:#31d0aa;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:radial-gradient(800px 400px at 20% 0%, rgba(250,204,21,.18), transparent 60%),
+                 radial-gradient(800px 400px at 80% 0%, rgba(255,216,107,.12), transparent 60%),
+                 var(--bg);
+      color:var(--txt);
+      min-height:100vh;
+      padding:18px;
+    }
+    .wrap{max-width:980px;margin:0 auto}
+    .top{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin-bottom:14px;
+    }
+    .title{
+      font-weight:800; letter-spacing:.3px;
+      font-size:18px;
+    }
+    .pill{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px;border-radius:999px;
+      background:rgba(255,255,255,.03)
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 18px 40px rgba(0,0,0,.35);
+    }
+    .card-h{
+      padding:14px 14px 10px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      border-bottom:1px solid var(--line);
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      font-weight:800;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:var(--gold);
+      box-shadow:0 0 0 4px rgba(250,204,21,.14);
+    }
+    .small{
+      font-size:12px;color:var(--muted);
+    }
+    .card-b{ padding:14px }
+    label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px }
+    input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.25);
+      color:var(--txt);
+      outline:none;
+    }
+    input:focus{
+      border-color:rgba(250,204,21,.45);
+      box-shadow:0 0 0 3px rgba(250,204,21,.18);
+    }
+    .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap }
+    button, a.btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    button.primary{
+      border-color:rgba(250,204,21,.35);
+      background:linear-gradient(180deg, rgba(250,204,21,.18), rgba(250,204,21,.06));
+    }
+    button:hover, a.btn:hover{ transform:translateY(-1px) }
+    .warn{ color:var(--danger); font-size:12px; margin-top:10px; line-height:1.4 }
+    .ok{ color:var(--ok) }
+    .log{
+      margin-top:16px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(0,0,0,.25);
+      font-size:12px;
+      color:var(--muted);
+      white-space:pre-wrap;
+      line-height:1.5;
+      min-height:56px;
+    }
+    .footer{
+      margin-top:14px;
+      font-size:12px;color:var(--muted);
+    }
+    code{color:var(--gold2)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="title">5G88 • App Deep-Link Tester</div>
+      <div class="pill" id="uaPill">Detecting device...</div>
+    </div>
+
+    <div class="grid">
+
+      <!-- MEGA888 -->
+      <section class="card" data-app="MEGA888">
+        <div class="card-h">
+          <div class="brand"><span class="dot"></span> MEGA888</div>
+          <div class="small">Try open app → fallback download</div>
+        </div>
+        <div class="card-b">
+          <label>Scheme / Deep link (edit to test)</label>
+          <input id="schemeMega" value="mega888://" />
+          <div class="row">
+            <button class="primary" onclick="tryOpenApp('MEGA888', schemeMega.value, 'https://download-mega888.vercel.app/')">
+              ▶ PLAY NOW
+            </button>
+            <a class="btn" href="https://download-mega888.vercel.app/" target="_blank" rel="noopener">
+              ⬇ DOWNLOAD
+            </a>
+          </div>
+          <div class="warn">
+            Tip: kalau tak buka, try tukar kepada <code>mega888app://</code> atau apa-apa scheme lain yang app kau support.
+          </div>
+        </div>
+      </section>
+
+      <!-- PUSSY888 -->
+      <section class="card" data-app="PUSSY888">
+        <div class="card-h">
+          <div class="brand"><span class="dot"></span> PUSSY888</div>
+          <div class="small">Try open app → fallback download</div>
+        </div>
+        <div class="card-b">
+          <label>Scheme / Deep link (edit to test)</label>
+          <input id="schemePussy" value="pussy888://" />
+          <div class="row">
+            <button class="primary" onclick="tryOpenApp('PUSSY888', schemePussy.value, 'https://download-pussy888.vercel.app/')">
+              ▶ PLAY NOW
+            </button>
+            <a class="btn" href="https://download-pussy888.vercel.app/" target="_blank" rel="noopener">
+              ⬇ DOWNLOAD
+            </a>
+          </div>
+          <div class="warn">
+            Tip: kalau tak buka, try <code>pussy888app://</code> / <code>pussy://</code> / scheme lain ikut version.
+          </div>
+        </div>
+      </section>
+
+      <!-- 918KISS -->
+      <section class="card" data-app="918KISS">
+        <div class="card-h">
+          <div class="brand"><span class="dot"></span> 918KISS</div>
+          <div class="small">Try open app → fallback download</div>
+        </div>
+        <div class="card-b">
+          <label>Scheme / Deep link (edit to test)</label>
+          <input id="scheme918" value="918kiss://" />
+          <div class="row">
+            <button class="primary" onclick="tryOpenApp('918KISS', scheme918.value, 'https://download-918kiss.vercel.app/')">
+              ▶ PLAY NOW
+            </button>
+            <a class="btn" href="https://download-918kiss.vercel.app/" target="_blank" rel="noopener">
+              ⬇ DOWNLOAD
+            </a>
+          </div>
+          <div class="warn">
+            Tip: kalau tak buka, try <code>kiss918://</code> / <code>918kissapp://</code> dll.
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="log" id="logBox">Log akan keluar di sini…</div>
+
+    <div class="footer">
+      Nota: iOS kadang akan keluar popup “Open in App?”. Android biasanya terus buka kalau scheme betul.
+      Kalau semua fail, maksudnya app kau tak support scheme itu — kita kena cari scheme sebenar.
+    </div>
+  </div>
+
+  <script>
+    const logBox = document.getElementById("logBox");
+    const uaPill = document.getElementById("uaPill");
+
+    function isAndroid(){ return /android/i.test(navigator.userAgent); }
+    function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent); }
+
+    uaPill.textContent = isAndroid() ? "Android detected" : (isIOS() ? "iOS detected" : "Desktop / Unknown");
+
+    function log(msg){
+      const time = new Date().toLocaleTimeString();
+      logBox.textContent = `[${time}] ${msg}\n\n` + logBox.textContent;
+    }
+
+    // Core: try open deep link; fallback after 1.3s to download page
+    function tryOpenApp(appName, schemeUrl, fallbackUrl){
+      schemeUrl = (schemeUrl || "").trim();
+      if(!schemeUrl){
+        log(`❌ ${appName}: Scheme kosong. Isi dulu contoh: ${appName.toLowerCase()}://`);
+        return;
+      }
+
+      log(`🚀 ${appName}: Cuba buka → ${schemeUrl}`);
+
+      // iOS/Android both: attempt scheme navigation
+      const start = Date.now();
+      window.location.href = schemeUrl;
+
+      // fallback if app not opened (best-effort)
+      setTimeout(() => {
+        const elapsed = Date.now() - start;
+        // If browser didn't go background / app didn't take over, fallback
+        // (Not perfect, but OK for testing)
+        log(`↩ ${appName}: Kalau app tak terbuka, pergi download (${elapsed}ms) → ${fallbackUrl}`);
+        window.location.href = fallbackUrl;
+      }, 1300);
+    }
+  </script>
+</body>
+</html>
