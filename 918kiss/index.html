@@ -173,21 +173,103 @@
   <tbody>
   </tbody>
 </table>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
+// ===== Firebase load games =====
+const firebaseConfig = {
+  apiKey: "AIzaSyCcmt4hEQuTePolLHFCGXS9Op2IeI-60qk",
+  authDomain: "fb-918kiss.firebaseapp.com",
+  databaseURL: "https://fb-918kiss-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "fb-918kiss",
+  storageBucket: "fb-918kiss.firebasestorage.app",
+  messagingSenderId: "866233725202",
+  appId: "1:866233725202:web:58d08c77446a91360fc3cb"
+};
+
+(function initFirebase(){
+  try{
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  }catch(e){}
+})();
+
+const gamesRef = firebase.database().ref("config918kiss/games");
+
+// rebuild custom select helper (optional)
+function rebuildCustomGameSelect(){
+  const native = document.getElementById('gameSelect');
+  if (!native) return;
+
+  const oldWrap = native.parentNode?.querySelector('.cs-wrap');
+  if (oldWrap) oldWrap.remove();
+
+  // ✅ reset flag supaya boleh build balik
+  delete native.dataset.csBuilt;
+
+  if (typeof initCustomGameSelect === "function") initCustomGameSelect();
+}
+
+// refresh native options from gameData
+function refreshGameSelectFromGameData(){
+  const native = document.getElementById("gameSelect");
+  if(!native) return;
+
+  const cur = native.value;
+  native.innerHTML = "";
+
+  const names = Object.keys(gameData);
+  names.forEach(name=>{
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    native.appendChild(opt);
+  });
+
+  if(cur && gameData[cur]) native.value = cur;
+  else native.value = names[0] || "";
+
+  native.dispatchEvent(new Event("change", {bubbles:true}));
+
+  // kalau guna custom select (cs-wrap)
+  rebuildCustomGameSelect();
+}
+
+// listen Firebase realtime
+function listenGames(){
+  gamesRef.on("value", (snap)=>{
+    const raw = snap.val() || {};
+    const filtered = {};
+
+    Object.keys(raw).forEach(name=>{
+      const g = raw[name] || {};
+      if (g.active === false) return;
+      filtered[name] = {
+        bets: Array.isArray(g.bets) ? g.bets : [],
+        pecahan: (g.pecahan && typeof g.pecahan === "object") ? g.pecahan : {}
+      };
+    });
+
+    gameData = filtered;
+    refreshGameSelectFromGameData();
+  });
+}
+
+window.addEventListener("DOMContentLoaded", ()=>{
+  listenGames();
+  initCustomGameSelect();
+});
 let hiddenRow = null;
 let lastWinRowIndex = -1;
 const MAX_FREE_GAME_ROWS = 10;   // maksimum 10 baris free game
 let autoFreeGameOn = false;   // ✅ status AUTO (off default)
-const gameData = {
-"FORTUNE": 
-{ bets: [1.00, 2.00, 5.00, 10.00, 20.00],pecahan: {1.00: [30.00, 60.00, 100.00, 130.00],2.00: [60.00, 90.00, 110.00, 150.00],5.00: [90.00, 120.00, 150.00, 180.00],10.00: [120.00, 150.00, 180.00, 210.00],20.00: [100.00, 150.00, 200.00, 500.00]}}
-};
+let gameData = {};
   let jackpotInsertedMap = JSON.parse(localStorage.getItem("jackpotInsertedMap")) || {};
-  (function initCustomGameSelect(){
+  function initCustomGameSelect(){
   const native = document.getElementById('gameSelect');
   if(!native) return;
-
+  if (native.dataset.csBuilt === "1") return;
+  native.dataset.csBuilt = "1";
   // Sembunyikan select asli (tetap dipakai untuk value & event)
   native.style.position='absolute';
   native.style.left='-9999px';
@@ -309,8 +391,8 @@ const gameData = {
     allItems.forEach(i=>{
       i.classList.toggle('active', i.dataset.value===native.value);
     });
-  });
-})();
+    });
+   }
   document.getElementById("gameSelect").addEventListener("change", function () {
   const game = this.value;
   const betSelect = document.getElementById("betSelect");
@@ -332,16 +414,19 @@ const gameData = {
 });
 document.getElementById("betSelect").addEventListener("change", function () {
   const game = document.getElementById("gameSelect").value;
-  const bet = parseFloat(this.value);
+  const betKey = (parseFloat(this.value) || 0).toFixed(2); // ✅ "1.00"
+
   const pecahanSelect = document.getElementById("pecahanSelect");
   pecahanSelect.innerHTML = "";
-if (gameData[game] && gameData[game].pecahan[bet]) {
-  const pecahanList = gameData[game].pecahan[bet];
-  pecahanList.forEach(p => {
-  const option = document.createElement("option");
-  option.value = p;
-  option.textContent = p.toFixed(2);
-  pecahanSelect.appendChild(option);
+
+  const pec = gameData?.[game]?.pecahan || {};
+const list = pec[betKey] || pec[String(parseFloat(betKey))] || pec[parseFloat(betKey)];
+  if (Array.isArray(list)) {
+    list.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p;
+      option.textContent = parseFloat(p).toFixed(2);
+      pecahanSelect.appendChild(option);
     });
   }
 });
