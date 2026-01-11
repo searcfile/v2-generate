@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin 918KISS - Games</title>
+
+<style>
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top, #1f2937 0, transparent 55%),
+                radial-gradient(circle at bottom, #020617 0, #000 65%);
+    color:#e5e7eb;
+    padding:18px;
+  }
+  .top{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:14px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .pill{
+    background: gold; color:#000; font-weight:900;
+    padding:6px 10px; border-radius:10px;
+  }
+  .btn{
+    height:38px; padding:0 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);
+    background:#111; color:#fff;
+    cursor:pointer;
+  }
+  .btn.gold{
+    background:gold; color:#000; border-color:gold; font-weight:800;
+  }
+  .btn.red{ background:#b91c1c; border-color:#b91c1c; }
+  .btn:active{ transform: translateY(1px); }
+
+  .card{
+    background: rgba(15,15,15,.76);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    overflow:hidden;
+  }
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .small{ font-size:12px; color: rgba(255,255,255,.65); }
+
+  table{ width:100%; border-collapse:collapse; }
+  th,td{ padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.07); text-align:left; }
+  th{ font-size:12px; letter-spacing:.06em; text-transform:uppercase; color: rgba(255,255,255,.6); }
+  .right{ text-align:right; }
+  .mono{ font-family: ui-monospace, Menlo, Consolas, monospace; font-size:12px; color: rgba(255,255,255,.7); }
+
+  .row-actions{ display:flex; gap:8px; justify-content:flex-end; }
+
+  /* switch */
+  .switch{
+    width:44px; height:26px; border-radius:999px;
+    background:#374151; position:relative; cursor:pointer;
+    border:1px solid rgba(255,255,255,.12);
+    display:inline-block;
+    vertical-align:middle;
+  }
+  .switch .knob{
+    width:20px; height:20px; border-radius:50%;
+    background:#fff; position:absolute; top:50%; left:3px;
+    transform: translateY(-50%);
+    transition: all .18s ease;
+  }
+  .switch.on{ background:#16a34a; border-color:#16a34a; }
+  .switch.on .knob{ left:21px; }
+
+  /* modal */
+  .modal{ display:none; position:fixed; inset:0; z-index:99999; }
+  .backdrop{ position:absolute; inset:0; background: rgba(0,0,0,.68); }
+  .dialog{
+    position:relative;
+    width:min(860px, 92vw);
+    margin: 6vh auto;
+    background:#0b0f16;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 30px 90px rgba(0,0,0,.7);
+  }
+  .head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.10);
+  }
+  .body{ padding:14px; display:grid; gap:10px; }
+  label{ font-size:12px; color: rgba(255,255,255,.65); }
+  input, textarea{
+    width:100%; box-sizing:border-box;
+    border-radius:10px;
+    background:#0f0f0f;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.12);
+    padding:10px;
+    font-size:14px;
+    outline:none;
+  }
+  textarea{ min-height: 220px; resize: vertical; }
+  .foot{
+    display:flex; justify-content:flex-end; gap:10px;
+    padding:12px 14px; border-top:1px solid rgba(255,255,255,.10);
+  }
+
+  .toast{
+    position:fixed; bottom:22px; left:50%;
+    transform:translateX(-50%);
+    background:#111827; color:#e5e7eb;
+    border:1px solid rgba(255,255,255,.12);
+    padding:10px 14px; border-radius:12px;
+    opacity:0; transition:opacity .25s ease;
+    z-index:999999;
+    max-width: 92vw;
+  }
+  .toast.show{ opacity:1; }
+</style>
+
+<!-- Firebase compat (no import) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+
+<body>
+
+<div class="top">
+  <div class="brand">
+    <div class="pill">ADMIN</div>
+    <div>
+      <div style="font-weight:900;">918KISS Game Manager</div>
+      <div class="small">Add / Edit / Delete / Active Toggle (No login for now)</div>
+    </div>
+  </div>
+
+  <button id="addBtn" class="btn gold">+ Add Game</button>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <div>
+      <div style="font-weight:900;">Games</div>
+      <div class="small">Data simpan dalam Firebase RTDB (tak hilang walau restart/clear cache)</div>
+    </div>
+    <div class="mono">Path: config918kiss/games</div>
+  </div>
+
+  <div style="overflow:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:220px;">Game</th>
+          <th style="width:140px;">Active</th>
+          <th>Bets</th>
+          <th>Pecahan keys</th>
+          <th class="right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="5" class="small">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="backdrop" id="backdrop"></div>
+  <div class="dialog">
+    <div class="head">
+      <div style="font-weight:900;" id="mTitle">Add Game</div>
+      <button class="btn" id="mX">✕</button>
+    </div>
+
+    <div class="body">
+      <div>
+        <label>Game Name</label>
+        <input id="mName" type="text" placeholder="Motorcycle" />
+        <div class="small">Nama ini jadi key, contoh: Motorcycle</div>
+      </div>
+
+      <div>
+        <label>Bets (comma separated)</label>
+        <input id="mBets" type="text" placeholder="1.00,1.25,1.50,1.75,2.00" />
+      </div>
+
+      <div>
+        <label>Pecahan JSON (key bet -> array pecahan)</label>
+        <textarea id="mPec" placeholder='{"1.00":[20,40,60,80],"1.25":[40,60,80,100]}'></textarea>
+        <div class="small">Pastikan key bet dalam JSON bentuk "1.00" (string) supaya match.</div>
+      </div>
+
+      <div>
+        <label>Active</label><br/>
+        <span id="mSwitch" class="switch on"><span class="knob"></span></span>
+        <span class="small" id="mSwitchText" style="margin-left:8px;">Active</span>
+      </div>
+    </div>
+
+    <div class="foot">
+      <button class="btn" id="mCancel">Cancel</button>
+      <button class="btn gold" id="mSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* =======================
+   Firebase config (YOURS)
+======================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCcmt4hEQuTePolLHFCGXS9Op2IeI-60qk",
+  authDomain: "fb-918kiss.firebaseapp.com",
+  databaseURL: "https://fb-918kiss-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "fb-918kiss",
+  storageBucket: "fb-918kiss.firebasestorage.app",
+  messagingSenderId: "866233725202",
+  appId: "1:866233725202:web:58d08c77446a91360fc3cb"
+};
+
+firebase.initializeApp(firebaseConfig);
+const gamesRef = firebase.database().ref("config918kiss/games");
+
+/* =======================
+   Helpers
+======================= */
+const el = (id)=>document.getElementById(id);
+function toast(msg){
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2500);
+}
+function fmt2(n){
+  const x = parseFloat(n);
+  return isNaN(x) ? null : parseFloat(x.toFixed(2));
+}
+function parseBetsCSV(s){
+  return (s||"")
+    .split(",")
+    .map(x => fmt2(x))
+    .filter(x => x !== null);
+}
+function normalizePecahan(obj){
+  const out = {};
+  Object.keys(obj||{}).forEach(k=>{
+    const kk = fmt2(k);
+    const key = kk === null ? String(k) : kk.toFixed(2);
+    const arr = Array.isArray(obj[k]) ? obj[k] : [];
+    out[key] = arr.map(v => fmt2(v)).filter(v=>v!==null);
+  });
+  return out;
+}
+function esc(s){
+  return String(s??"")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+/* =======================
+   Render table
+======================= */
+const tbody = el("tbody");
+
+function render(data){
+  const names = Object.keys(data||{}).sort((a,b)=>a.localeCompare(b));
+  if(!names.length){
+    tbody.innerHTML = `<tr><td colspan="5" class="small">No games yet. Click + Add Game.</td></tr>`;
+    return;
+  }
+
+  let html = "";
+  for(const name of names){
+    const g = data[name] || {};
+    const active = g.active !== false; // default true
+    const bets = Array.isArray(g.bets) ? g.bets : [];
+    const pec = (g.pecahan && typeof g.pecahan === "object") ? g.pecahan : {};
+    const keys = Object.keys(pec);
+
+    html += `
+      <tr>
+        <td>
+          <div style="font-weight:900;">${esc(name)}</div>
+          <div class="mono">/config918kiss/games/${esc(name)}</div>
+        </td>
+
+        <td>
+          <span class="switch ${active ? "on":""}" data-toggle="${esc(name)}"><span class="knob"></span></span>
+          <span class="small" style="margin-left:8px;">${active ? "Active":"Inactive"}</span>
+        </td>
+
+        <td>${esc(bets.map(x=>fmt2(x)?.toFixed(2) ?? "").filter(Boolean).join(", "))}</td>
+        <td class="mono">${esc(keys.join(", "))}</td>
+
+        <td class="right">
+          <div class="row-actions">
+            <button class="btn" data-edit="${esc(name)}">Edit</button>
+            <button class="btn red" data-del="${esc(name)}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  tbody.innerHTML = html;
+
+  // bind events
+  tbody.querySelectorAll("[data-toggle]").forEach(sw=>{
+    sw.addEventListener("click", ()=> toggleActive(sw.getAttribute("data-toggle")));
+  });
+  tbody.querySelectorAll("[data-edit]").forEach(btn=>{
+    btn.addEventListener("click", ()=> openEdit(btn.getAttribute("data-edit")));
+  });
+  tbody.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=> delGame(btn.getAttribute("data-del")));
+  });
+}
+
+gamesRef.on("value", snap=>{
+  render(snap.val() || {});
+});
+
+/* =======================
+   Toggle / Delete
+======================= */
+async function toggleActive(name){
+  const snap = await gamesRef.child(name).child("active").get();
+  const cur = snap.exists() ? !!snap.val() : true;
+  await gamesRef.child(name).child("active").set(!cur);
+  toast(`${name} -> ${!cur ? "Inactive" : "Active"}`);
+}
+
+async function delGame(name){
+  const ok = confirm(`Delete "${name}" ?`);
+  if(!ok) return;
+  await gamesRef.child(name).remove();
+  toast(`Deleted: ${name}`);
+}
+
+/* =======================
+   Modal Add/Edit
+======================= */
+const modal = el("modal");
+const mTitle = el("mTitle");
+const mName = el("mName");
+const mBets = el("mBets");
+const mPec  = el("mPec");
+const mSwitch = el("mSwitch");
+const mSwitchText = el("mSwitchText");
+
+let modalMode = "add";
+let editKey = null;
+let activeState = true;
+
+function setActive(on){
+  activeState = !!on;
+  mSwitch.classList.toggle("on", activeState);
+  mSwitchText.textContent = activeState ? "Active" : "Inactive";
+}
+
+function openModal(){
+  modal.style.display = "block";
+}
+function closeModal(){
+  modal.style.display = "none";
+}
+
+el("addBtn").addEventListener("click", ()=>{
+  modalMode = "add";
+  editKey = null;
+  mTitle.textContent = "Add Game";
+  mName.disabled = false;
+  mName.value = "";
+  mBets.value = "";
+  mPec.value = "";
+  setActive(true);
+  openModal();
+});
+
+el("backdrop").addEventListener("click", closeModal);
+el("mX").addEventListener("click", closeModal);
+el("mCancel").addEventListener("click", closeModal);
+mSwitch.addEventListener("click", ()=> setActive(!activeState));
+
+async function openEdit(name){
+  const snap = await gamesRef.child(name).get();
+  if(!snap.exists()) return toast("Game not found");
+
+  const g = snap.val() || {};
+  modalMode = "edit";
+  editKey = name;
+
+  mTitle.textContent = "Edit Game";
+  mName.value = name;
+  mName.disabled = true;
+
+  const bets = Array.isArray(g.bets) ? g.bets : [];
+  mBets.value = bets.map(x => fmt2(x)?.toFixed(2)).filter(Boolean).join(",");
+
+  const pec = (g.pecahan && typeof g.pecahan === "object") ? g.pecahan : {};
+  mPec.value = JSON.stringify(pec, null, 2);
+
+  setActive(g.active !== false);
+  openModal();
+}
+
+el("mSave").addEventListener("click", async ()=>{
+  const name = (mName.value || "").trim();
+  if(!name) return toast("Game name kosong");
+
+  const bets = parseBetsCSV(mBets.value);
+  if(!bets.length) return toast("Bets format salah. Contoh: 1.00,1.25,2.00");
+
+  let pecRaw = {};
+  try{
+    pecRaw = JSON.parse(mPec.value || "{}");
+  }catch(e){
+    return toast("Pecahan JSON salah");
+  }
+
+  const payload = {
+    active: activeState,
+    bets: bets,
+    pecahan: normalizePecahan(pecRaw)
+  };
+
+  const key = modalMode === "edit" ? editKey : name;
+  await gamesRef.child(key).set(payload);
+  toast(`Saved: ${key}`);
+  closeModal();
+});
+</script>
+
+</body>
+</html>
