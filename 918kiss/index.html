@@ -414,14 +414,13 @@ let gameData = {};
 });
 document.getElementById("betSelect").addEventListener("change", function () {
   const game = document.getElementById("gameSelect").value;
-  const betKey = (parseFloat(this.value) || 0).toFixed(2).replace('.', '_');
-  const list = gameData?.[game]?.pecahan?.[betKey];
+
+  const betKey = (parseFloat(this.value) || 0).toFixed(2).replace(".", "_"); // ✅ 1_00
 
   const pecahanSelect = document.getElementById("pecahanSelect");
   pecahanSelect.innerHTML = "";
 
-  const pec = gameData?.[game]?.pecahan || {};
-const list = pec[betKey] || pec[String(parseFloat(betKey))] || pec[parseFloat(betKey)];
+  const list = gameData?.[game]?.pecahan?.[betKey];
   if (Array.isArray(list)) {
     list.forEach(p => {
       const option = document.createElement("option");
