@@ -261,6 +261,21 @@ function normalizePecahan(obj){
   });
   return out;
 }
+// ✅ Firebase RTDB key tak boleh ada "." jadi kita convert 1.00 -> "1_00"
+function betToKey(bet){
+  return (parseFloat(bet) || 0).toFixed(2).replace(".", "_");
+}
+
+// ✅ tukar semua key pecahan dari "1.00" ke "1_00"
+function normalizePecahanFirebaseKeys(obj){
+  const out = {};
+  Object.keys(obj || {}).forEach(k=>{
+    const safeKey = betToKey(k); // "1.00" -> "1_00"
+    const arr = Array.isArray(obj[k]) ? obj[k] : [];
+    out[safeKey] = arr.map(v => fmt2(v)).filter(v => v !== null);
+  });
+  return out;
+}
 function esc(s){
   return String(s??"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -429,11 +444,11 @@ el("mSave").addEventListener("click", async ()=>{
     return toast("Pecahan JSON salah");
   }
 
-  const payload = {
-    active: activeState,
-    bets: bets,
-    pecahan: normalizePecahan(pecRaw)
-  };
+const payload = {
+  active: activeState,
+  bets: bets,
+  pecahan: normalizePecahanFirebaseKeys(pecRaw)
+};
 
   const key = modalMode === "edit" ? editKey : name;
   await gamesRef.child(key).set(payload);
