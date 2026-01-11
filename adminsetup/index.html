@@ -251,13 +251,19 @@ function parseBetsCSV(s){
     .map(x => fmt2(x))
     .filter(x => x !== null);
 }
+function betKeyToDbKey(bet){
+  const n = parseFloat(bet);
+  if (isNaN(n)) return String(bet || "");
+  // "1.00" -> "1_00"
+  return n.toFixed(2).replace(".", "_");
+}
+
 function normalizePecahan(obj){
   const out = {};
   Object.keys(obj||{}).forEach(k=>{
-    const kk = fmt2(k);
-    const key = kk === null ? String(k) : kk.toFixed(2);
+    const dbKey = betKeyToDbKey(k); // ✅ simpan sebagai 1_00
     const arr = Array.isArray(obj[k]) ? obj[k] : [];
-    out[key] = arr.map(v => fmt2(v)).filter(v=>v!==null);
+    out[dbKey] = arr.map(v => fmt2(v)).filter(v=>v!==null);
   });
   return out;
 }
